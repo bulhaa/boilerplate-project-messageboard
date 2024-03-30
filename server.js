@@ -3,6 +3,7 @@ require('dotenv').config();
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const cors        = require('cors');
+const helmet        = require('helmet');
 
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -10,6 +11,18 @@ const runner            = require('./test-runner');
 
 const app = express();
 
+
+app.use(helmet.frameguard({action: 'sameorigin'}));
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.xssFilter());
+
+app.use(
+  helmet({
+    referrerPolicy: {
+      policy: "same-origin",
+    },
+  })
+);
 app.use('/public', express.static(process.cwd() + '/public'));
 
 app.use(cors({origin: '*'})); //For FCC testing purposes only
@@ -61,5 +74,6 @@ const listener = app.listen(process.env.PORT || 3000, function () {
     }, 1500);
   }
 });
+
 
 module.exports = app; //for testing
